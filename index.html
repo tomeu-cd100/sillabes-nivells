@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Síl·labes — Activitat per Nivells</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-dark: #3730a3;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --danger: #f59e0b;
+  --danger-light: #fef3c7;
+  --neutral: #f8fafc;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --white: #ffffff;
+  --shadow: 0 4px 24px rgba(79,70,229,0.10);
+  --shadow-lg: 0 8px 40px rgba(79,70,229,0.16);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: #f0f2ff;
+  min-height: 100vh;
+  color: var(--text);
+}
+h1,h2,h3,h4 { font-family: 'Nunito', sans-serif; }
+
+/* ── Layout ── */
+.app { max-width: 780px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+/* ── Header ── */
+.app-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 2rem 1.5rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  border-radius: var(--radius);
+  color: white;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+.app-header::before {
+  content:'';
+  position:absolute; top:-40px; right:-40px;
+  width:180px; height:180px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 50%;
+}
+.app-header h1 { font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; }
+.app-header p { font-size: 1rem; opacity: 0.85; margin-top: 0.4rem; }
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+}
+.card-title {
+  font-size: 1.1rem; font-weight: 800;
+  color: var(--primary); margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Mode selector ── */
+.mode-tabs {
+  display: flex; gap: 0.75rem;
+  background: var(--neutral);
+  padding: 6px; border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+}
+.mode-tab {
+  flex: 1; padding: 0.7rem 1rem;
+  border: none; border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: 0.95rem;
+  cursor: pointer; transition: all 0.2s;
+  color: var(--text-muted); background: transparent;
+}
+.mode-tab.active {
+  background: var(--primary); color: white;
+  box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+}
+
+/* ── Level grid ── */
+.levels-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+.level-btn {
+  padding: 1rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--white);
+  cursor: pointer; transition: all 0.2s;
+  text-align: center; font-family: 'Nunito', sans-serif;
+}
+.level-btn:hover { border-color: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+.level-btn.active { border-color: var(--primary); background: #eef2ff; }
+.level-btn .level-icon { font-size: 1.6rem; display: block; margin-bottom: 0.3rem; }
+.level-btn .level-name { font-weight: 800; font-size: 0.8rem; color: var(--primary); display: block; }
+.level-btn .level-desc { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; display: block; }
+
+/* ── Word display ── */
+.word-box {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+  border: 2px solid #c7d2fe;
+}
+.word-big {
+  font-family: 'Nunito', sans-serif;
+  font-size: 3.5rem; font-weight: 900;
+  color: var(--primary-dark);
+  letter-spacing: 4px;
+  margin-bottom: 1rem;
+}
+.audio-row {
+  display: flex; gap: 0.75rem;
+  justify-content: center; align-items: center;
+  flex-wrap: wrap;
+}
+.btn-listen {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--primary); color: white;
+  border: none; padding: 10px 22px;
+  border-radius: 8px; font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: 0.95rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-listen:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.speed-pills {
+  display: flex; gap: 4px;
+  background: #e0e7ff; padding: 4px; border-radius: 8px;
+}
+.speed-pill {
+  padding: 6px 12px; border: none; border-radius: 6px;
+  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.8rem;
+  cursor: pointer; background: transparent; color: var(--primary);
+  transition: all 0.2s;
+}
+.speed-pill.active { background: var(--primary); color: white; }
+
+/* ── Accent badge ── */
+.accent-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 20px;
+  font-weight: 700; font-size: 0.82rem;
+  margin-bottom: 1.25rem;
+}
+.accent-aguda { background: #fee2e2; color: #991b1b; }
+.accent-plana { background: #dbeafe; color: #1e40af; }
+.accent-esdruxola { background: #d1fae5; color: #065f46; }
+.accent-mono { background: #fef3c7; color: #92400e; }
+
+/* ── Input ── */
+.input-label {
+  font-weight: 700; font-size: 0.82rem;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 0.6rem; display: block;
+}
+.input-row { display: flex; gap: 8px; }
+.answer-input {
+  flex: 1; padding: 13px 16px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-size: 1.2rem;
+  font-weight: 700; letter-spacing: 3px;
+  transition: all 0.2s; color: var(--text);
+}
+.answer-input:focus { outline: none; border-color: var(--primary); background: #eef2ff; }
+.answer-input.ok { border-color: var(--success); background: var(--success-light); }
+.answer-input.ko { border-color: #ef4444; background: #fef2f2; }
+.answer-input:disabled { background: #f8fafc; color: #94a3b8; }
+
+.btn-check {
+  padding: 13px 28px; border: none;
+  background: var(--primary); color: white;
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.btn-check:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+/* ── Feedback ── */
+.feedback-box {
+  padding: 1rem 1.25rem; border-radius: var(--radius-sm);
+  margin: 1rem 0; font-weight: 700; font-size: 0.95rem;
+  display: flex; align-items: flex-start; gap: 10px;
+  animation: popIn 0.3s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.feedback-ok  { background: var(--success-light); border: 2px solid #6ee7b7; color: #065f46; }
+.feedback-ko  { background: var(--danger-light);  border: 2px solid #fcd34d; color: #78350f; }
+.feedback-icon { font-size: 1.4rem; flex-shrink: 0; }
+.feedback-text { display: flex; flex-direction: column; gap: 4px; }
+.feedback-main { font-size: 1rem; }
+.feedback-hint { font-size: 0.83rem; font-weight: 600; opacity: 0.85; }
+
+/* ── Solution ── */
+.solution-box {
+  background: #eef2ff; border: 2px solid #c7d2fe;
+  border-radius: var(--radius-sm); padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+}
+.solution-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+.solution-word { font-family: 'Nunito', sans-serif; font-size: 1.6rem; font-weight: 900; color: var(--primary); letter-spacing: 3px; }
+
+/* ── Bottom buttons ── */
+.btn-row { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+.btn-next {
+  flex: 1; padding: 13px 24px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  color: white; border: none; border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-next:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.btn-skip {
+  padding: 13px 20px; border: 2px solid var(--border);
+  background: var(--white); color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-skip:hover { border-color: var(--primary-light); color: var(--primary); }
+
+/* ── Stats bar ── */
+.stats-bar {
+  display: flex; gap: 1rem;
+  margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.stat-chip {
+  background: white; border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.6rem 1rem;
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; min-width: 80px;
+}
+.stat-val { font-family: 'Nunito', sans-serif; font-size: 1.5rem; font-weight: 900; color: var(--primary); }
+.stat-lbl { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+/* ── Tip box ── */
+.tip-box {
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: var(--radius-sm); padding: 0.85rem 1rem;
+  font-size: 0.85rem; color: #78350f; margin-bottom: 1.25rem;
+}
+.tip-box strong { font-weight: 800; }
+
+/* ── Exam config ── */
+.exam-config { display: flex; flex-direction: column; gap: 1rem; }
+.config-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.config-label { font-weight: 700; font-size: 0.88rem; color: var(--text-muted); min-width: 100px; }
+.config-input {
+  padding: 9px 14px; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: 0.95rem; width: 180px;
+}
+.config-input:focus { outline: none; border-color: var(--primary); }
+.config-select {
+  padding: 9px 14px; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: 0.95rem; background: white; cursor: pointer;
+}
+.config-select:focus { outline: none; border-color: var(--primary); }
+.btn-start-exam {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white; border: none; border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem;
+  cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+}
+.btn-start-exam:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(16,185,129,0.3); }
+.btn-start-exam:disabled { background: #d1d5db; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── Exam progress ── */
+.exam-progress-bar {
+  background: #e0e7ff; border-radius: 20px; height: 10px; margin-bottom: 1rem; overflow: hidden;
+}
+.exam-progress-fill {
+  background: linear-gradient(90deg, var(--primary), #7c3aed);
+  height: 100%; border-radius: 20px; transition: width 0.4s ease;
+}
+.exam-counter { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.75rem; }
+
+/* ── Timer ── */
+.timer-box {
+  display: flex; align-items: center; gap: 8px;
+  background: #fef3c7; border: 1px solid #fde68a;
+  border-radius: 8px; padding: 8px 14px;
+  font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: 1.1rem; color: #78350f;
+}
+.timer-box.urgent { background: #fee2e2; border-color: #fca5a5; color: #991b1b; animation: pulse 0.7s infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+/* ── Results ── */
+.results-header {
+  text-align: center; padding: 2rem;
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  border-radius: var(--radius-sm); margin-bottom: 1.5rem;
+}
+.results-pct {
+  font-family: 'Nunito', sans-serif; font-size: 4rem; font-weight: 900;
+  color: var(--primary); line-height: 1;
+}
+.results-subtitle { font-size: 1rem; color: var(--text-muted); margin-top: 0.5rem; font-weight: 600; }
+.results-star { font-size: 2rem; margin-bottom: 0.5rem; }
+
+.result-row {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.85rem 1rem; border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem; border: 1px solid var(--border);
+}
+.result-row.ok-row { background: #f0fdf4; border-color: #bbf7d0; }
+.result-row.ko-row { background: #fffbeb; border-color: #fde68a; }
+.result-word { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.05rem; flex: 1; }
+.result-answer { font-family: 'Nunito', sans-serif; font-size: 0.88rem; color: var(--text-muted); }
+.result-correct { font-family: 'Nunito', sans-serif; font-size: 0.88rem; color: var(--success); font-weight: 700; }
+.result-status { font-size: 1.2rem; }
+
+.btn-print {
+  width: 100%; padding: 14px;
+  background: white; border: 2px solid var(--primary);
+  color: var(--primary); border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s; margin-top: 0.75rem;
+}
+.btn-print:hover { background: #eef2ff; }
+.btn-restart {
+  width: 100%; padding: 14px;
+  background: var(--primary); border: none;
+  color: white; border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+}
+.btn-restart:hover { background: var(--primary-dark); }
+
+/* ── Loading ── */
+.loading-box { text-align: center; padding: 3rem 1rem; }
+.spinner {
+  display: inline-block; width: 44px; height: 44px;
+  border: 4px solid #e0e7ff; border-top-color: var(--primary);
+  border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-family: 'Nunito', sans-serif; font-weight: 700; color: var(--primary); font-size: 1rem; }
+
+/* ── Print ── */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ccc; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .word-big { font-size: 2.5rem; }
+  .card { padding: 1.25rem; }
+  .levels-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ═══════════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════════ */
+const LEVELS = [
+  { id:1, name:"1r Primària", icon:"🌱", syllMin:2, syllMax:2, lenMin:2, lenMax:5,  desc:"2 síl·labes, curtes" },
+  { id:2, name:"2n Primària", icon:"🌿", syllMin:2, syllMax:3, lenMin:3, lenMax:6,  desc:"2-3 síl·labes" },
+  { id:3, name:"3r Primària", icon:"🍀", syllMin:2, syllMax:3, lenMin:4, lenMax:7,  desc:"2-3 síl·labes, mig" },
+  { id:4, name:"4t Primària", icon:"🌳", syllMin:3, syllMax:4, lenMin:5, lenMax:8,  desc:"3-4 síl·labes" },
+  { id:5, name:"5è Primària", icon:"⭐", syllMin:3, syllMax:4, lenMin:6, lenMax:9,  desc:"3-4 síl·labes, llargues" },
+  { id:6, name:"6è Primària", icon:"🌟", syllMin:3, syllMax:5, lenMin:6, lenMax:10, desc:"3-5 síl·labes" },
+  { id:7, name:"1r ESO",      icon:"🚀", syllMin:3, syllMax:5, lenMin:7, lenMax:11, desc:"4-5 síl·labes" },
+  { id:8, name:"2n ESO",      icon:"💡", syllMin:4, syllMax:5, lenMin:8, lenMax:12, desc:"4-5 síl·labes, difícils" },
+  { id:9, name:"3r ESO",      icon:"🔥", syllMin:4, syllMax:6, lenMin:8, lenMax:14, desc:"5-6 síl·labes" },
+  { id:10,name:"4t ESO",      icon:"🏆", syllMin:5, syllMax:7, lenMin:9, lenMax:18, desc:"6+ síl·labes, complexes" },
+];
+
+const POSITIVE_FEEDBACK = [
+  "Gairebé! Revisa bé cada síl·laba — ho faràs!",
+  "Bon intent! Torna-ho a intentar, ets capaç!",
+  "Quasi! Has estat molt a prop, no et rendeixis!",
+  "Molt bé per provar-ho! Observa la solució i aprendràs.",
+  "Segueix endavant! Cada error és un pas cap a l'èxit.",
+  "Força! La pràctica fa el mestre. Ho tens!",
+];
+
+const ACCENT_LABELS = {
+  aguda:         { cls: 'accent-aguda',    text: 'Paraula aguda' },
+  plana:         { cls: 'accent-plana',    text: 'Paraula plana' },
+  esdrúixola:    { cls: 'accent-esdruxola',text: 'Paraula esdrúixola' },
+  'monosil·làbica':{ cls: 'accent-mono',  text: 'Monosil·làbica' },
+};
+
+/* ═══════════════════════════════════════════
+   SÍL·LABES ENGINE
+═══════════════════════════════════════════ */
+function separateSyllables(word) {
+  if (!word) return [];
+  const V = 'aeiouàáäâèéëêìíïîòóöôùúüû';
+  const C = 'bcdfghjklmnpqrstvwxyz';
+  let sylls = [], cur = '', i = 0;
+  while (i < word.length) {
+    cur += word[i];
+    if (i+1 < word.length && V.includes(word[i+1]) && C.includes(word[i])) {
+      i++;
+      cur += word[i];
+      while (i+1 < word.length && C.includes(word[i+1])) {
+        if (i+2 < word.length && V.includes(word[i+2])) break;
+        i++;
+        cur += word[i];
+      }
+      sylls.push(cur);
+      cur = '';
+    }
+    i++;
+  }
+  if (cur) {
+    if (!sylls.length) sylls = [cur];
+    else sylls[sylls.length-1] += cur;
+  }
+  return sylls.length ? sylls : [word];
+}
+
+function getAccentType(word, sylls) {
+  if (sylls.length === 1) return 'monosil·làbica';
+  const ACC = 'àáäâèéëêìíïîòóöôùúüû';
+  let ai = -1;
+  for (let i=0; i<word.length; i++) if (ACC.includes(word[i])) { ai=i; break; }
+  if (ai !== -1) {
+    let cc=0, si=-1;
+    for (let i=0; i<sylls.length; i++) {
+      cc += sylls[i].length;
+      if (cc > ai) { si=i; break; }
+    }
+    const pos = sylls.length - 1 - si;
+    if (pos===0) return 'aguda';
+    if (pos===1) return 'plana';
+    return 'esdrúixola';
+  }
+  return sylls.length >= 2 ? 'plana' : 'aguda';
+}
+
+function normalize(s) {
+  return s.toLowerCase().trim().replace(/\s+/g,'');
+}
+
+/* ═══════════════════════════════════════════
+   COMPONENT PRINCIPAL
+═══════════════════════════════════════════ */
+function App() {
+  const [words, setWords]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [mode, setMode]       = useState('practice'); // 'practice' | 'exam'
+  const [level, setLevel]     = useState(null);
+
+  // Exam config
+  const [examCfg, setExamCfg] = useState({
+    studentName: '', studentGroup: '',
+    numWords: 10, timeMode: 'words', timeSecs: 300,
+  });
+  const [examState, setExamState] = useState(null); // null | 'running' | 'done'
+  const [examWords, setExamWords] = useState([]);
+  const [examIdx, setExamIdx]     = useState(0);
+  const [examResults, setExamResults] = useState([]);
+  const [timeLeft, setTimeLeft]   = useState(0);
+  const timerRef = useRef(null);
+
+  // Practice state
+  const [practiceWord, setPracticeWord] = useState('');
+  const [userAnswer, setUserAnswer]     = useState('');
+  const [checked, setChecked]           = useState(false);
+  const [feedback, setFeedback]         = useState(null);
+  const [speed, setSpeed]               = useState(1);
+  const [stats, setStats]               = useState({ total:0, correct:0 });
+
+  // Exam answer
+  const [examAnswer, setExamAnswer] = useState('');
+  const [examChecked, setExamChecked] = useState(false);
+  const [examFeedback, setExamFeedback] = useState(null);
+
+  /* ── Load words ── */
+  useEffect(() => {
+    fetch('https://raw.githubusercontent.com/PabloGGuizar/an-array-of-catalan-words/master/index.json')
+      .then(r => r.json())
+      .then(data => {
+        const filtered = data.filter(w =>
+          w.length > 2 && w.length < 20 &&
+          /^[a-zàáäâèéëêìíïîòóöôùúüû]+$/.test(w)
+        );
+        setWords(filtered);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  /* ── Timer ── */
+  useEffect(() => {
+    if (examState === 'running' && examCfg.timeMode === 'time') {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(t => {
+          if (t <= 1) { clearInterval(timerRef.current); finishExam(); return 0; }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [examState]);
+
+  /* ── Filter words by level ── */
+  const wordsForLevel = (lvl) => {
+    if (!lvl) return [];
+    return words.filter(w => {
+      if (w.length < lvl.lenMin || w.length > lvl.lenMax) return false;
+      const s = separateSyllables(w);
+      return s.length >= lvl.syllMin && s.length <= lvl.syllMax;
+    });
+  };
+
+  const pickRandom = (pool) => pool[Math.floor(Math.random() * pool.length)];
+
+  /* ── Practice: new word ── */
+  const newPracticeWord = (lvl) => {
+    const pool = wordsForLevel(lvl || level);
+    if (!pool.length) return;
+    setPracticeWord(pickRandom(pool));
+    setUserAnswer('');
+    setChecked(false);
+    setFeedback(null);
+  };
+
+  const handleLevelSelect = (lvl) => {
+    setLevel(lvl);
+    newPracticeWord(lvl);
+  };
+
+  /* ── Practice: check ── */
+  const handleCheck = () => {
+    if (!userAnswer.trim() || !practiceWord) return;
+    const sylls = separateSyllables(practiceWord);
+    const correct = sylls.join('-');
+    const ok = normalize(userAnswer) === normalize(correct);
+    setChecked(true);
+    setFeedback(ok ? 'ok' : 'ko');
+    setStats(s => ({ total: s.total+1, correct: s.correct+(ok?1:0) }));
+  };
+
+  const play = (word) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'ca-ES'; u.rate = speed;
+    window.speechSynthesis.speak(u);
+  };
+
+  /* ── Exam: start ── */
+  const startExam = () => {
+    const pool = wordsForLevel(level);
+    if (!pool.length) return;
+    const shuffled = [...pool].sort(() => Math.random()-0.5);
+    const chosen = shuffled.slice(0, examCfg.numWords);
+    setExamWords(chosen);
+    setExamIdx(0);
+    setExamResults([]);
+    setExamAnswer('');
+    setExamChecked(false);
+    setExamFeedback(null);
+    setExamState('running');
+    if (examCfg.timeMode === 'time') setTimeLeft(examCfg.timeSecs);
+  };
+
+  /* ── Exam: check ── */
+  const handleExamCheck = () => {
+    if (!examAnswer.trim()) return;
+    const word = examWords[examIdx];
+    const sylls = separateSyllables(word);
+    const correct = sylls.join('-');
+    const ok = normalize(examAnswer) === normalize(correct);
+    setExamChecked(true);
+    setExamFeedback(ok ? 'ok' : 'ko');
+    setExamResults(r => [...r, { word, userAnswer: examAnswer, correct, ok }]);
+  };
+
+  /* ── Exam: next ── */
+  const handleExamNext = () => {
+    if (examIdx + 1 >= examWords.length) { finishExam(); return; }
+    setExamIdx(i => i+1);
+    setExamAnswer('');
+    setExamChecked(false);
+    setExamFeedback(null);
+  };
+
+  const finishExam = () => {
+    clearInterval(timerRef.current);
+    setExamState('done');
+  };
+
+  /* ── Compute hint ── */
+  const getHint = (word, userAns) => {
+    const sylls = separateSyllables(word);
+    const correct = sylls.join('-');
+    const userParts = userAns.split('-');
+    const correctParts = correct.split('-');
+    if (userParts.length !== correctParts.length)
+      return `La paraula té ${correctParts.length} síl·laba${correctParts.length>1?'es':''}, no ${userParts.length}.`;
+    for (let i=0; i<correctParts.length; i++) {
+      if (normalize(userParts[i]) !== normalize(correctParts[i]))
+        return `Revisa la síl·laba número ${i+1}.`;
+    }
+    return 'Revisa els accents de les vocals.';
+  };
+
+  /* ── Print report ── */
+  const printReport = () => {
+    const ok = examResults.filter(r=>r.ok).length;
+    const pct = Math.round((ok/examResults.length)*100);
+    const stars = pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':pct>=50?'⭐':'';
+    const content = `
+      <html><head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; padding: 2cm; color: #1e293b; }
+          h1 { color: #4f46e5; }
+          h2 { color: #64748b; font-size: 1rem; font-weight: normal; margin-bottom: 1.5rem; }
+          .meta { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
+          .meta span { margin-right: 2rem; font-weight: bold; }
+          .pct { font-size: 3rem; font-weight: 900; color: #4f46e5; text-align: center; padding: 1rem; }
+          table { width: 100%; border-collapse: collapse; }
+          th { background: #4f46e5; color: white; padding: 8px 12px; text-align: left; font-size: 0.85rem; }
+          td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+          .ok { color: #10b981; font-weight: bold; }
+          .ko { color: #f59e0b; font-weight: bold; }
+          .correct { color: #10b981; }
+        </style>
+      </head><body>
+        <h1>Informe d'Examen — Síl·labes</h1>
+        <div class="meta">
+          <span>Alumne/a: ${examCfg.studentName}</span>
+          <span>Grup: ${examCfg.studentGroup}</span>
+          <span>Nivell: ${level.name}</span>
+          <span>Data: ${new Date().toLocaleDateString('ca-ES')}</span>
+        </div>
+        <div class="pct">${stars} ${pct}% d'encerts (${ok}/${examResults.length})</div>
+        <table>
+          <tr><th>Paraula</th><th>Resposta alumne</th><th>Solució correcta</th><th>Resultat</th></tr>
+          ${examResults.map(r=>`
+            <tr>
+              <td><strong>${r.word}</strong></td>
+              <td>${r.userAnswer}</td>
+              <td class="correct">${r.correct}</td>
+              <td class="${r.ok?'ok':'ko'}">${r.ok?'✓ Correcta':'✗ Incorrecta'}</td>
+            </tr>
+          `).join('')}
+        </table>
+      </body></html>
+    `;
+    const w = window.open('','_blank');
+    w.document.write(content);
+    w.document.close();
+    w.print();
+  };
+
+  /* ═══════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════ */
+  if (loading) return (
+    <div className="app">
+      <div className="app-header no-print">
+        <h1>Síl·labes per Nivells</h1>
+        <p>Activitat de llengua catalana</p>
+      </div>
+      <div className="card">
+        <div className="loading-box">
+          <div className="spinner"></div>
+          <div className="loading-text">Carregant el diccionari català...</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const practiceReady = mode === 'practice' && level && practiceWord;
+  const practSylls = practiceReady ? separateSyllables(practiceWord) : [];
+  const practCorrect = practSylls.join('-');
+  const practAccent = practiceReady ? getAccentType(practiceWord, practSylls) : null;
+
+  // Exam current word
+  const eWord = examState==='running' ? examWords[examIdx] : null;
+  const eSylls = eWord ? separateSyllables(eWord) : [];
+  const eCorrect = eSylls.join('-');
+  const eAccent = eWord ? getAccentType(eWord, eSylls) : null;
+
+  const examPct = examResults.length
+    ? Math.round((examResults.filter(r=>r.ok).length / examResults.length)*100) : 0;
+  const resultStars = examPct>=90?'🏆':examPct>=70?'⭐':examPct>=50?'💪':'📚';
+
+  const formatTime = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+
+  return (
+    <div className="app">
+
+      {/* ── Header ── */}
+      <div className="app-header no-print">
+        <h1>Síl·labes per Nivells</h1>
+        <p>Activitat de llengua catalana · De 1r de Primària fins a 4t de l'ESO</p>
+      </div>
+
+      {/* ── Mode tabs (only when not running exam) ── */}
+      {examState !== 'running' && examState !== 'done' && (
+        <div className="mode-tabs no-print">
+          <button className={`mode-tab ${mode==='practice'?'active':''}`} onClick={()=>setMode('practice')}>
+            📖 Pràctica lliure
+          </button>
+          <button className={`mode-tab ${mode==='exam'?'active':''}`} onClick={()=>setMode('exam')}>
+            📝 Examen
+          </button>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════
+          PRACTICE MODE
+      ══════════════════════════════════ */}
+      {mode === 'practice' && examState !== 'running' && examState !== 'done' && (
+        <>
+          {/* Level selector */}
+          <div className="card no-print">
+            <div className="card-title">🎯 Tria el nivell</div>
+            <div className="levels-grid">
+              {LEVELS.map(lvl => (
+                <button key={lvl.id}
+                  className={`level-btn ${level?.id===lvl.id?'active':''}`}
+                  onClick={() => handleLevelSelect(lvl)}
+                >
+                  <span className="level-icon">{lvl.icon}</span>
+                  <span className="level-name">{lvl.name}</span>
+                  <span className="level-desc">{lvl.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Practice area */}
+          {level && (
+            <div className="card">
+              {/* Stats */}
+              <div className="stats-bar">
+                <div className="stat-chip">
+                  <span className="stat-val">{stats.total}</span>
+                  <span className="stat-lbl">Paraules</span>
+                </div>
+                <div className="stat-chip">
+                  <span className="stat-val">{stats.correct}</span>
+                  <span className="stat-lbl">Correctes</span>
+                </div>
+                <div className="stat-chip">
+                  <span className="stat-val">{stats.total>0?Math.round(stats.correct/stats.total*100):0}%</span>
+                  <span className="stat-lbl">Encerts</span>
+                </div>
+              </div>
+
+              {/* Word */}
+              {practiceWord ? (
+                <>
+                  <div className="word-box">
+                    <div className="word-big">{practiceWord}</div>
+                    <div className="audio-row">
+                      <button className="btn-listen" onClick={()=>play(practiceWord)}>🔊 Escoltar</button>
+                      <div className="speed-pills">
+                        {[{v:0.33,l:'0.33x'},{v:0.5,l:'0.5x'},{v:1,l:'1x'}].map(s=>(
+                          <button key={s.v} className={`speed-pill ${speed===s.v?'active':''}`}
+                            onClick={()=>setSpeed(s.v)}>{s.l}</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {practAccent && (
+                    <span className={`accent-badge ${ACCENT_LABELS[practAccent]?.cls}`}>
+                      {ACCENT_LABELS[practAccent]?.text}
+                    </span>
+                  )}
+
+                  <div className="tip-box">
+                    <strong>💡 Consell:</strong> Separa les síl·labes amb guions (-). Exemple: <strong>ca-sa</strong>
+                  </div>
+
+                  <div style={{marginBottom:'1.25rem'}}>
+                    <label className="input-label">La teva resposta:</label>
+                    <div className="input-row">
+                      <input className={`answer-input ${checked&&feedback==='ok'?'ok':''} ${checked&&feedback==='ko'?'ko':''}`}
+                        value={userAnswer}
+                        onChange={e=>setUserAnswer(e.target.value)}
+                        onKeyDown={e=>e.key==='Enter'&&!checked&&handleCheck()}
+                        placeholder={`${practiceWord.slice(0,3)}-...`}
+                        disabled={checked}
+                        autoFocus
+                      />
+                      {!checked && <button className="btn-check" onClick={handleCheck}>Comprovar</button>}
+                    </div>
+                  </div>
+
+                  {feedback==='ok' && (
+                    <div className="feedback-box feedback-ok">
+                      <span className="feedback-icon">🎉</span>
+                      <div className="feedback-text">
+                        <span className="feedback-main">Excel·lent! Resposta correcta!</span>
+                      </div>
+                    </div>
+                  )}
+                  {feedback==='ko' && (
+                    <div className="feedback-box feedback-ko">
+                      <span className="feedback-icon">💪</span>
+                      <div className="feedback-text">
+                        <span className="feedback-main">{POSITIVE_FEEDBACK[Math.floor(Math.random()*POSITIVE_FEEDBACK.length)]}</span>
+                        <span className="feedback-hint">📌 {getHint(practiceWord, userAnswer)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {checked && (
+                    <div className="solution-box">
+                      <div className="solution-label">✓ Solució correcta:</div>
+                      <div className="solution-word">{practCorrect}</div>
+                    </div>
+                  )}
+
+                  <div className="btn-row">
+                    {!checked && (
+                      <button className="btn-skip" onClick={()=>newPracticeWord(level)}>⏭ Passar</button>
+                    )}
+                    {checked && (
+                      <button className="btn-next" onClick={()=>newPracticeWord(level)}>Següent paraula →</button>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div style={{textAlign:'center',padding:'2rem',color:'var(--text-muted)'}}>
+                  No hi ha paraules per a aquest nivell. Prova un altre nivell.
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ══════════════════════════════════
+          EXAM MODE — CONFIG
+      ══════════════════════════════════ */}
+      {mode === 'exam' && !examState && (
+        <>
+          {/* Level selector */}
+          <div className="card no-print">
+            <div className="card-title">🎯 Tria el nivell de l'examen</div>
+            <div className="levels-grid">
+              {LEVELS.map(lvl => (
+                <button key={lvl.id}
+                  className={`level-btn ${level?.id===lvl.id?'active':''}`}
+                  onClick={()=>setLevel(lvl)}
+                >
+                  <span className="level-icon">{lvl.icon}</span>
+                  <span className="level-name">{lvl.name}</span>
+                  <span className="level-desc">{lvl.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {level && (
+            <div className="card no-print">
+              <div className="card-title">⚙️ Configuració de l'examen</div>
+              <div className="exam-config">
+
+                <div className="config-row">
+                  <span className="config-label">Nom alumne/a:</span>
+                  <input className="config-input" style={{width:'100%',flex:1}}
+                    placeholder="Nom i cognoms"
+                    value={examCfg.studentName}
+                    onChange={e=>setExamCfg(c=>({...c,studentName:e.target.value}))}
+                  />
+                </div>
+
+                <div className="config-row">
+                  <span className="config-label">Grup / Classe:</span>
+                  <input className="config-input"
+                    placeholder="Ex: 2n A"
+                    value={examCfg.studentGroup}
+                    onChange={e=>setExamCfg(c=>({...c,studentGroup:e.target.value}))}
+                  />
+                </div>
+
+                <div className="config-row">
+                  <span className="config-label">Mode examen:</span>
+                  <select className="config-select"
+                    value={examCfg.timeMode}
+                    onChange={e=>setExamCfg(c=>({...c,timeMode:e.target.value}))}
+                  >
+                    <option value="words">Per nombre de paraules</option>
+                    <option value="time">Per temps</option>
+                  </select>
+                </div>
+
+                {examCfg.timeMode === 'words' && (
+                  <div className="config-row">
+                    <span className="config-label">Nº paraules:</span>
+                    <select className="config-select"
+                      value={examCfg.numWords}
+                      onChange={e=>setExamCfg(c=>({...c,numWords:parseInt(e.target.value)}))}
+                    >
+                      {[5,10,15,20,25,30].map(n=><option key={n} value={n}>{n} paraules</option>)}
+                    </select>
+                  </div>
+                )}
+
+                {examCfg.timeMode === 'time' && (
+                  <div className="config-row">
+                    <span className="config-label">Temps:</span>
+                    <select className="config-select"
+                      value={examCfg.timeSecs}
+                      onChange={e=>setExamCfg(c=>({...c,timeSecs:parseInt(e.target.value)}))}
+                    >
+                      {[120,180,300,420,600].map(s=><option key={s} value={s}>{formatTime(s)} minuts</option>)}
+                    </select>
+                    <span style={{fontSize:'0.85rem',color:'var(--text-muted)',marginLeft:'0.5rem'}}>
+                      (màxim {examCfg.numWords} paraules)
+                    </span>
+                  </div>
+                )}
+
+                <button className="btn-start-exam"
+                  disabled={!examCfg.studentName.trim() || !examCfg.studentGroup.trim()}
+                  onClick={startExam}
+                >
+                  🚀 Iniciar l'examen
+                </button>
+                {(!examCfg.studentName.trim() || !examCfg.studentGroup.trim()) && (
+                  <p style={{fontSize:'0.82rem',color:'var(--text-muted)',textAlign:'center'}}>
+                    Cal introduir el nom i el grup per poder iniciar l'examen.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ══════════════════════════════════
+          EXAM MODE — RUNNING
+      ══════════════════════════════════ */}
+      {examState === 'running' && eWord && (
+        <div className="card">
+          {/* Header info */}
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem',flexWrap:'wrap',gap:'0.5rem'}}>
+            <span style={{fontSize:'0.9rem',fontWeight:700,color:'var(--text-muted)'}}>
+              {examCfg.studentName} · {examCfg.studentGroup} · {level.name}
+            </span>
+            {examCfg.timeMode === 'time' && (
+              <div className={`timer-box ${timeLeft<30?'urgent':''}`}>
+                ⏱ {formatTime(timeLeft)}
+              </div>
+            )}
+          </div>
+
+          {/* Progress */}
+          <div className="exam-counter">
+            Paraula {examIdx+1} de {examWords.length}
+          </div>
+          <div className="exam-progress-bar">
+            <div className="exam-progress-fill"
+              style={{width:`${((examIdx)/examWords.length)*100}%`}}
+            />
+          </div>
+
+          {/* Word */}
+          <div className="word-box">
+            <div className="word-big">{eWord}</div>
+            <div className="audio-row">
+              <button className="btn-listen" onClick={()=>play(eWord)}>🔊 Escoltar</button>
+              <div className="speed-pills">
+                {[{v:0.33,l:'0.33x'},{v:0.5,l:'0.5x'},{v:1,l:'1x'}].map(s=>(
+                  <button key={s.v} className={`speed-pill ${speed===s.v?'active':''}`}
+                    onClick={()=>setSpeed(s.v)}>{s.l}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {eAccent && (
+            <span className={`accent-badge ${ACCENT_LABELS[eAccent]?.cls}`}>
+              {ACCENT_LABELS[eAccent]?.text}
+            </span>
+          )}
+
+          <div className="tip-box">
+            <strong>💡</strong> Separa les síl·labes amb guions (-). Exemple: <strong>ca-sa</strong>
+          </div>
+
+          <div style={{marginBottom:'1rem'}}>
+            <label className="input-label">La teva resposta:</label>
+            <div className="input-row">
+              <input
+                className={`answer-input ${examChecked&&examFeedback==='ok'?'ok':''} ${examChecked&&examFeedback==='ko'?'ko':''}`}
+                value={examAnswer}
+                onChange={e=>setExamAnswer(e.target.value)}
+                onKeyDown={e=>e.key==='Enter'&&!examChecked&&handleExamCheck()}
+                placeholder={`${eWord.slice(0,3)}-...`}
+                disabled={examChecked}
+                autoFocus
+              />
+              {!examChecked && <button className="btn-check" onClick={handleExamCheck}>Comprovar</button>}
+            </div>
+          </div>
+
+          {examFeedback==='ok' && (
+            <div className="feedback-box feedback-ok">
+              <span className="feedback-icon">🎉</span>
+              <div className="feedback-text">
+                <span className="feedback-main">Excel·lent! Resposta correcta!</span>
+              </div>
+            </div>
+          )}
+          {examFeedback==='ko' && (
+            <div className="feedback-box feedback-ko">
+              <span className="feedback-icon">💪</span>
+              <div className="feedback-text">
+                <span className="feedback-main">{POSITIVE_FEEDBACK[Math.floor(Math.random()*POSITIVE_FEEDBACK.length)]}</span>
+                <span className="feedback-hint">📌 {getHint(eWord, examAnswer)}</span>
+              </div>
+            </div>
+          )}
+
+          {examChecked && (
+            <div className="solution-box">
+              <div className="solution-label">✓ Solució correcta:</div>
+              <div className="solution-word">{eCorrect}</div>
+            </div>
+          )}
+
+          {examChecked && (
+            <div className="btn-row">
+              <button className="btn-next" onClick={handleExamNext}>
+                {examIdx+1 >= examWords.length ? 'Veure resultats 📊' : 'Següent paraula →'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════
+          EXAM — RESULTS
+      ══════════════════════════════════ */}
+      {examState === 'done' && (
+        <div className="card">
+          <div className="results-header">
+            <div className="results-star">{resultStars}</div>
+            <div className="results-pct">{examPct}%</div>
+            <div className="results-subtitle">
+              {examResults.filter(r=>r.ok).length} de {examResults.length} paraules correctes
+            </div>
+            <div style={{marginTop:'0.75rem',fontSize:'0.9rem',color:'var(--text-muted)'}}>
+              {examCfg.studentName} · {examCfg.studentGroup} · {level.name}
+            </div>
+          </div>
+
+          <div className="card-title">📋 Detall de respostes</div>
+          {examResults.map((r,i) => (
+            <div key={i} className={`result-row ${r.ok?'ok-row':'ko-row'}`}>
+              <span className="result-status">{r.ok?'✅':'⚠️'}</span>
+              <span className="result-word">{r.word}</span>
+              <div style={{display:'flex',flexDirection:'column',gap:'2px',textAlign:'right'}}>
+                <span className="result-answer">Tu: {r.userAnswer}</span>
+                {!r.ok && <span className="result-correct">✓ {r.correct}</span>}
+              </div>
+            </div>
+          ))}
+
+          <button className="btn-print" onClick={printReport}>🖨️ Imprimir / Exportar informe</button>
+          <button className="btn-restart" onClick={()=>{ setExamState(null); setMode('exam'); }}>
+            🔄 Fer un altre examen
+          </button>
+          <button className="btn-restart" style={{background:'#64748b',marginTop:'0.5rem'}}
+            onClick={()=>{ setExamState(null); setMode('practice'); }}>
+            📖 Tornar a la pràctica
+          </button>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
